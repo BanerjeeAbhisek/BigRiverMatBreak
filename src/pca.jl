@@ -4,7 +4,7 @@
 
 
 # Two packages: LinearAlgebra for matrix operations, and Statistics for mean and std.
-using LinearAlgebra, Statistics
+# using LinearAlgebra, Statistics --- IGNORE --- (moved to BRMB.jl)
 
 # A structure to hold the PCA model parameters: mean, scale, loadings (principal directions), variances, and proportion of variance explained.
 struct pcaStructure{T}
@@ -66,59 +66,6 @@ function pca_invtransform(m::pcaStructure, scores)
     Xc = scores * m.loadings'          # back to full feature width (centered space)
     return Xc .* m.scale' .+ m.mean'   # undo the scaling, then undo the centering
 end
-
-
-
-
-
-
-
-
-
-
-################################### TESTING ###################################
-n, p, r = 5000, 200, 10    # 5000 observations, 200 features, 10 hidden signals
-latent  = randn(n, r)              #  10 latent signals (5000 × 10) (components) that we will try to recover with PCA
-mixing  = randn(r, p)              # random mixing matrix (10 × 200) that mixes the latent signals into the observed features
-X       = latent * mixing .+ 0.05 .* randn(n, p)    # observed data (5000 × 200) is the mixed latent signals plus some noise
-println("X is $(size(X,1)) × $(size(X,2))  ($(length(X)) entries)\n")
-k    = 15
-msvd = pca(X; k = k, method = :svd)
-mcov = pca(X; k = k, method = :cov)
-println("propOFvar (svd), first $k components:")
-println(round.(msvd.propOFvar, digits = 4))
-println("\ncumulative variance explained:")
-println(round.(cumsum(msvd.propOFvar), digits = 4))
-println("\nmax |variance| difference, svd vs cov : ",maximum(abs.(msvd.variances .- mcov.variances)))
-
-scores = pca_transform(msvd, X)
-println("\nscores size : ", size(scores))          # (5000, 15)
- 
-Xhat = pca_invtransform(msvd, scores)
-rmse = sqrt(sum(abs2, X .- Xhat) / length(X))
-println("reconstruction RMSE (k = $k) : ", round(rmse, digits = 5))
- 
-
-m10    = pca(X; k = 10, method = :svd)
-rmse10 = sqrt(sum(abs2, X .- pca_invtransform(m10, pca_transform(m10, X))) / length(X))
-println("reconstruction RMSE (k = 10) : ", round(rmse10, digits = 5))
-
-println("\n-- timing (compilation already warmed up) --")
-pca(X; k = k, method = :svd); pca(X; k = k, method = :cov)   # warmup
-print("svd : "); msvd = @time pca(X; k = k, method = :svd);  
-print("cov : "); mcov = @time pca(X; k = k, method = :cov);
-
-
-
-
- 
- 
-
-
-
-
-
-
 
 
 
