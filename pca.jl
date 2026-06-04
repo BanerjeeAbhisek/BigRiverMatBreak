@@ -90,8 +90,7 @@ println(round.(msvd.propOFvar, digits = 4))
 println("\ncumulative variance explained:")
 println(round.(cumsum(msvd.propOFvar), digits = 4))
 println("\nmax |variance| difference, svd vs cov : ",maximum(abs.(msvd.variances .- mcov.variances)))
-# Transform (project down) and reconstruct
-# ---------------------------------------------------------------------------
+
 scores = pca_transform(msvd, X)
 println("\nscores size : ", size(scores))          # (5000, 15)
  
@@ -99,14 +98,11 @@ Xhat = pca_invtransform(msvd, scores)
 rmse = sqrt(sum(abs2, X .- Xhat) / length(X))
 println("reconstruction RMSE (k = $k) : ", round(rmse, digits = 5))
  
-# Keeping only the 10 "real" components should already be near-perfect:
+
 m10    = pca(X; k = 10, method = :svd)
 rmse10 = sqrt(sum(abs2, X .- pca_invtransform(m10, pca_transform(m10, X))) / length(X))
 println("reconstruction RMSE (k = 10) : ", round(rmse10, digits = 5))
-# ---------------------------------------------------------------------------
-# Rough speed comparison. n >> p here, so :cov should be faster.
-# First call compiles, so we warm up once, then time the second call.
-# ---------------------------------------------------------------------------
+
 println("\n-- timing (compilation already warmed up) --")
 pca(X; k = k, method = :svd); pca(X; k = k, method = :cov)   # warmup
 print("svd : "); msvd = @time pca(X; k = k, method = :svd);  
