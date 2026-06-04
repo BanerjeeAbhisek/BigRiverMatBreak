@@ -16,30 +16,30 @@ mixing  = randn(r, p)              # random mixing matrix (10 × 200) that mixes
 X       = latent * mixing .+ 0.05 .* randn(n, p)    # observed data (5000 × 200) is the mixed latent signals plus some noise
 println("X is $(size(X,1)) × $(size(X,2))  ($(length(X)) entries)\n")
 k    = 15
-msvd = pca(X; k = k, method = :svd)
-mcov = pca(X; k = k, method = :cov)
+msvd = BRMB.pca(X; k = k, method = :svd)
+mcov = BRMB.pca(X; k = k, method = :cov)
 println("propOFvar (svd), first $k components:")
 println(round.(msvd.propOFvar, digits = 4))
 println("\ncumulative variance explained:")
 println(round.(cumsum(msvd.propOFvar), digits = 4))
 println("\nmax |variance| difference, svd vs cov : ",maximum(abs.(msvd.variances .- mcov.variances)))
 
-scores = pca_transform(msvd, X)
+scores = BRMB.pca_transform(msvd, X)
 println("\nscores size : ", size(scores))          # (5000, 15)
  
-Xhat = pca_invtransform(msvd, scores)
+Xhat = BRMB.pca_invtransform(msvd, scores)
 rmse = sqrt(sum(abs2, X .- Xhat) / length(X))
 println("reconstruction RMSE (k = $k) : ", round(rmse, digits = 5))
  
 
-m10    = pca(X; k = 10, method = :svd)
-rmse10 = sqrt(sum(abs2, X .- pca_invtransform(m10, pca_transform(m10, X))) / length(X))
+m10    = BRMB.pca(X; k = 10, method = :svd)
+rmse10 = sqrt(sum(abs2, X .- BRMB.pca_invtransform(m10, BRMB.pca_transform(m10, X))) / length(X))
 println("reconstruction RMSE (k = 10) : ", round(rmse10, digits = 5))
 
 println("\n-- timing (compilation already warmed up) --")
-pca(X; k = k, method = :svd); pca(X; k = k, method = :cov)   # warmup
-print("svd : "); msvd = @time pca(X; k = k, method = :svd);  
-print("cov : "); mcov = @time pca(X; k = k, method = :cov);
+BRMB.pca(X; k = k, method = :svd); BRMB.pca(X; k = k, method = :cov)   # warmup
+print("svd : "); msvd = @time BRMB.pca(X; k = k, method = :svd);  
+print("cov : "); mcov = @time BRMB.pca(X; k = k, method = :cov);
 
 
 
