@@ -2,7 +2,7 @@
 include(joinpath(@__DIR__, "..", "src", "BRMB.jl"))
 using .BRMB
 using LinearAlgebra, Statistics, Random
-Random.seed!(1234)
+Random.seed!(123456)
 
 n, p, r = 300, 40, 3
 X = randn(n, r) * randn(r, p) .+ 0.1 .* randn(n, p)

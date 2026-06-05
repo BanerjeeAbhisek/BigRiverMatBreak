@@ -96,23 +96,23 @@ end
 # deflating, we project each new u away from the earlier u's via (I - UUᵀ).
 function spca_component_orth(X, c, U_prev; tol = 1e-6, maxiter = 500)
     v = randn(eltype(X), size(X, 2))
-    v ./= norm(v)
+    v ./= norm(v)  # same power iteration initialization as before, but now we have to be careful to create u in the function's scope so we can project it away from U_pre
     for _ in 1:5
         v = X' * (X * v)
         v ./= norm(v)
     end
-    u = X * v; u ./= norm(u)        # ← ADD THIS: create u in the function's scope first
+    u = X * v; u ./= norm(u)        # this u is in the function's scope, so we can project it away from U_prev in the main loop; the first time through, U_prev is empty, so this does nothing; on subsequent iterations, this ensures that u is orthogonal to all previous u's
     for _ in 1:maxiter
         v_old = v
         u = X * v                   # now this reassigns the existing u, not a new local
-        if !isempty(U_prev)
+        if !isempty(U_prev)         # if there are previous u's, project this u away from them to enforce orthogonality; this is the (I - UUᵀ)u step in eq. 3.13-3.17, p.526-527
             u .-= U_prev * (U_prev' * u)
         end
-        u ./= norm(u)
-        v = finding_v(X' * u, c)
-        norm(v - v_old) < tol && break
+        u ./= norm(u)        # normalize this u to have L2 norm 1
+        v = finding_v(X' * u, c)         # same v update as before, but now with this new u that is orthogonal to previous u's; this is the same Step 2(b) as before, but now with the new u that has been projected to be orthogonal to previous u's
+        norm(v - v_old) < tol && break   # convergence check
     end
-    d = u' * X * v                  # u still exists here now
+    d = u' * X * v                  #  same d update as before, but now with this new u and v; this is the same Step 3 as before, but now with the new u and v that have been computed with the orthogonality constraint on u
     return d, u, v
 end
 
@@ -135,7 +135,7 @@ function pmd_orth(X; k = 2, c = sqrt(size(X, 2)) / 2, standardize = false,
         dj, uj, vj = spca_component_orth(Xc, c, U; tol = tol, maxiter = maxiter)
         V[:, j] = vj
         d[j]    = dj
-        U = hcat(U, uj)                         # append this u so the next one avoids it
+        U = hcat(U, uj)                         # add this new u to the collection of previous u's; this ensures that on the next iteration, the new u will be orthogonal to all previous u's
     end
 
     SignConsistency!(V)

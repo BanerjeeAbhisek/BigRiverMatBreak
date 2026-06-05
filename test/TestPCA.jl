@@ -3,7 +3,7 @@ include(joinpath(@__DIR__, "..", "src", "BRMB.jl")) # this finds src/BRMB.jl, wh
 using .BRMB   # this makes the exported names from BRMB.jl available in this test file, so we can call pca, pca_transform, etc. directly without prefixing with BRMB.
 
 using Random, LinearAlgebra # we need Random for seeding the random number generator, and LinearAlgebra for matrix operations in the test code.
-Random.seed!(1234) 
+#Random.seed!(1234) 
 
 
 
