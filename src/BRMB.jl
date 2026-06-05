@@ -11,9 +11,20 @@ using LinearAlgebra, Statistics   # We need these packages for matrix operations
 
 # include your code using a path relative to THIS file.
 # @__DIR__ is the folder BRMB.jl lives in (src/), so this always finds src/pca.jl.
-include(joinpath(@__DIR__, "pca.jl")) #  
+include(joinpath(@__DIR__, "pca.jl")) 
+include(joinpath(@__DIR__, "pmd.jl")) 
 
 # export the names you want usable after `using .BRMB`
-export pca, pcaStructure, pca_transform, pca_invtransform
+export pca, pcaStructure, pca_transform, pca_invtransform, pmd, pmd_orth
 
 end
+
+
+
+
+
+
+
+
+
+
