@@ -15,7 +15,7 @@ using .BRMB
 n, p, k = 5000, 200, 15
 X = randn(n, p)
 
-# --- your SVD path ---
+#  our SVD path 
 b_mine = @btime BRMB.pca($X; k = $k, method = :svd);
 # Run 1: 37.356 ms (77 allocations: 24.62 MiB)
 # Run 2: 37.436 ms (77 allocations: 24.62 MiB)
@@ -24,7 +24,7 @@ b_mine = @btime BRMB.pca($X; k = $k, method = :svd);
 # Run 5: 37.438 ms (77 allocations: 24.62 MiB)
 
 
-# --- Jchemo's SVD path ---
+#  Jchemo's SVD path 
 b_jchemo = @btime pcasvd($X; nlv = $k);
 # Run 1: 37.755 ms (124 allocations: 17.76 MiB)
 # Run 2: 38.371 ms (124 allocations: 17.76 MiB)
