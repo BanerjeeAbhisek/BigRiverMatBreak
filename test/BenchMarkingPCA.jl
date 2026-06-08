@@ -1,3 +1,7 @@
+
+
+
+
 # Benchmarking my PCA with Jchemo PCA for svd method .....
 
 
@@ -35,3 +39,4 @@ b_jchemo = @btime pcasvd($X; nlv = $k);
 
 
 
+# Benchmarking PMD
